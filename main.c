@@ -8,7 +8,7 @@
 *
 *
 *******************************************************************************
-* Copyright 2021-2023, Cypress Semiconductor Corporation (an Infineon company) or
+* Copyright 2021-2024, Cypress Semiconductor Corporation (an Infineon company) or
 * an affiliate of Cypress Semiconductor Corporation.  All rights reserved.
 *
 * This software, including source code, documentation and related
@@ -45,6 +45,7 @@
 *******************************************************************************/
 #include "cyhal.h"
 #include "cybsp.h"
+#include "cy_retarget_io.h"
 
 /*******************************************************************************
 * Macros
@@ -80,8 +81,7 @@
 *  void
 *
 *******************************************************************************/
-
-int main( )
+int main(void)
 {
     cy_rslt_t result;
 
@@ -94,13 +94,25 @@ int main( )
         CY_ASSERT(0);
     }
 
+
+    /* Initialize retarget-io to use the debug UART port */
+    result = cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX,
+                                 CY_RETARGET_IO_BAUDRATE);
+    /* retarget-io init failed. Stop program execution */
+    if (result != CY_RSLT_SUCCESS)
+    {
+        CY_ASSERT(0);
+    }
+
    /* Enable global interrupts */
     __enable_irq();
 
-    for (;;)
-     {
+    /* \x1b[2J\x1b[;H - ANSI ESC sequence for clear screen */
+    printf("\x1b[2J\x1b[;H");
 
-     }
+    printf("****************** "
+           "HAL: Empty App! Example "
+           "****************** \n");
 }
 
 /* [] END OF FILE */
